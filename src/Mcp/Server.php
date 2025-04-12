@@ -6,7 +6,7 @@ use Bramato\LaravelMcpServer\Mcp\Interfaces\ResourceInterface;
 use Bramato\LaravelMcpServer\Mcp\Interfaces\ServerInterface;
 use Bramato\LaravelMcpServer\Mcp\Interfaces\ToolInterface;
 use Bramato\LaravelMcpServer\Mcp\Interfaces\TransportInterface;
-use Sajya\Server as SajyaRpcServer; // Alias per Sajya\Server
+use Sajya\Server\Server as SajyaRpcServer;
 use Throwable;
 use Illuminate\Support\Facades\Log;
 
