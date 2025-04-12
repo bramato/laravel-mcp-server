@@ -7,7 +7,7 @@ use Bramato\LaravelMcpServer\Mcp\Interfaces\ResourceInterface;
 use Bramato\LaravelMcpServer\Mcp\Interfaces\ServerInterface;
 use Bramato\LaravelMcpServer\Mcp\Interfaces\ToolInterface;
 use Bramato\LaravelMcpServer\Mcp\Server;
-use Sajya\Server as SajyaRpcServer; // Alias per Sajya\Server
+// use Sajya\Server as SajyaRpcServer; // No longer needed
 use Illuminate\Support\Facades\Event;
 use Laravel\Reverb\Events\MessageReceived;
 use Bramato\LaravelMcpServer\Listeners\HandleReverbMessage;
@@ -27,17 +27,15 @@ class McpServiceProvider extends ServiceProvider
             'mcp'
         );
 
-        // Registra l'handler JSON-RPC (Sajya)
-        $this->app->singleton(SajyaRpcServer::class, function ($app) {
-            // Qui si potrebbero passare opzioni da config('mcp.rpc_handler_options') a Sajya
-            return new SajyaRpcServer();
-        });
+        // Remove SajyaRpcServer binding as it's no longer directly injected
+        // $this->app->singleton(SajyaRpcServer::class, function ($app) {
+        //     return new SajyaRpcServer();
+        // });
 
         // Registra la nostra implementazione del Server MCP
         $this->app->singleton(ServerInterface::class, function ($app) {
-            $server = new Server(
-                $app->make(SajyaRpcServer::class)
-            );
+            // Instantiate Server directly without SajyaRpcServer injection
+            $server = new Server();
 
             // Registra Resources e Tools dalla configurazione
             $config = $app['config']['mcp'];
