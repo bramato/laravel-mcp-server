@@ -233,14 +233,19 @@ class Server implements ServerInterface
     protected function handleSingleRequest(SajyaRequest $request): ?array
     {
         $method = $request->getMethod();
-        $params = $request->getParams() ?? []; // Ensure params is an array
+        $params = $request->getParams() ?? []; // Ensure params is array or object from JSON
         $id = $request->getId();
 
         try {
             // 1. Handle 'initialize'
             if ($method === 'initialize') {
-                // Allow params to be null or an empty array, but not contain actual values.
-                if ($params !== null && $params !== []) {
+                // DEBUG: Log type and value of params
+                Log::debug('MCP Initialize: Checking params', [
+                    'type' => gettype($params),
+                    'value' => print_r($params, true)
+                ]);
+                // Use empty() after casting to array to handle both [] and {}
+                if (!empty((array)$params)) {
                     throw new InvalidParams("The 'initialize' method does not accept parameters.");
                 }
                 $result = $this->initialize();
@@ -267,8 +272,8 @@ class Server implements ServerInterface
                     throw new McpError("Resource '$resourceUri' not found.", -32601, ['uri' => $resourceUri]);
                 }
                 $resource = $this->resources[$resourceUri];
-                // Allow params to be null or an empty array, but not contain actual values.
-                if ($params !== null && $params !== []) {
+                // Use empty() after casting to array to handle both [] and {}
+                if (!empty((array)$params)) {
                     throw new InvalidParams("Method 'resource:$resourceUri' does not accept parameters.");
                 }
                 Log::debug("Getting contents for resource '$resourceUri'");
