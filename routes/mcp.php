@@ -12,11 +12,40 @@ if (!empty($path)) {
     Route::post($path, [RpcController::class, 'handle'])
         ->name('mcp.rpc.http.post');
 
-    // Add a GET route for health check / compatibility with clients like Cursor
+    // Add a GET route for SSE Transport / compatibility with MCP clients
     Route::get($path, function () {
-        return response()->json([
-            'status' => 'ok',
-            'message' => 'Laravel MCP Server HTTP endpoint is active. Use POST for JSON-RPC requests.'
-        ]);
+        return response()->stream(
+            function () {
+                echo "data: " . json_encode([
+                    'type' => 'connection',
+                    'status' => 'ok',
+                    'message' => 'Laravel MCP Server HTTP SSE Transport active. Ready for MCP communication.'
+                ]) . "\n\n";
+
+                ob_flush();
+                flush();
+
+                // Keep the connection open
+                while (true) {
+                    // Check connection status
+                    if (connection_aborted()) {
+                        break;
+                    }
+
+                    // Send heartbeat every 30 seconds to keep connection alive
+                    sleep(30);
+                    echo "data: " . json_encode(['type' => 'heartbeat']) . "\n\n";
+                    ob_flush();
+                    flush();
+                }
+            },
+            200,
+            [
+                'Content-Type' => 'text/event-stream',
+                'Cache-Control' => 'no-cache',
+                'Connection' => 'keep-alive',
+                'X-Accel-Buffering' => 'no', // Disable nginx buffering
+            ]
+        );
     })->name('mcp.rpc.http.get');
 }
