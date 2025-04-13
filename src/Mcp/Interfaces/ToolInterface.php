@@ -2,6 +2,8 @@
 
 namespace Bramato\LaravelMcpServer\Mcp\Interfaces;
 
+use Illuminate\Support\Collection;
+
 interface ToolInterface
 {
     /**
@@ -28,8 +30,8 @@ interface ToolInterface
     /**
      * Execute the tool with the given arguments.
      *
-     * @param array $arguments
+     * @param Collection $arguments
      * @return mixed The result of the tool execution.
      */
-    public function execute(array $arguments): mixed;
+    public function execute(Collection $arguments): mixed;
 }
