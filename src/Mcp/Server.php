@@ -345,4 +345,20 @@ class Server implements ServerInterface
             'error' => $error,
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResources(): array
+    {
+        return $this->resources;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTools(): array
+    {
+        return $this->tools;
+    }
 }

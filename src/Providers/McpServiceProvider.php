@@ -61,6 +61,8 @@ class McpServiceProvider extends ServiceProvider
         // Registra i comandi Artisan
         $this->commands([
             \Bramato\LaravelMcpServer\Console\Commands\McpServerCommand::class,
+            \Bramato\LaravelMcpServer\Console\Commands\McpListCommand::class,
+            \Bramato\LaravelMcpServer\Console\Commands\McpConfigCursorCommand::class,
         ]);
     }
 

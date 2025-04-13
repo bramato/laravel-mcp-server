@@ -43,4 +43,18 @@ interface ServerInterface
      * @return void
      */
     public function registerTool(ToolInterface $tool): void;
+
+    /**
+     * Get the currently registered MCP Resources.
+     *
+     * @return array<string, ResourceInterface> Array keyed by resource URI.
+     */
+    public function getResources(): array;
+
+    /**
+     * Get the currently registered MCP Tools.
+     *
+     * @return array<string, ToolInterface> Array keyed by tool name.
+     */
+    public function getTools(): array;
 }
