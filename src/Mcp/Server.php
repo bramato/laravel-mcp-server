@@ -239,7 +239,8 @@ class Server implements ServerInterface
         try {
             // 1. Handle 'initialize'
             if ($method === 'initialize') {
-                if (!empty($params)) {
+                // Allow params to be null or an empty array, but not contain actual values.
+                if ($params !== null && $params !== []) {
                     throw new InvalidParams("The 'initialize' method does not accept parameters.");
                 }
                 $result = $this->initialize();
@@ -266,7 +267,8 @@ class Server implements ServerInterface
                     throw new McpError("Resource '$resourceUri' not found.", -32601, ['uri' => $resourceUri]);
                 }
                 $resource = $this->resources[$resourceUri];
-                if (!empty($params)) {
+                // Allow params to be null or an empty array, but not contain actual values.
+                if ($params !== null && $params !== []) {
                     throw new InvalidParams("Method 'resource:$resourceUri' does not accept parameters.");
                 }
                 Log::debug("Getting contents for resource '$resourceUri'");
