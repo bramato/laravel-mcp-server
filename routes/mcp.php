@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Bramato\LaravelMcpServer\Http\Controllers\RpcController;
-use Illuminate\Http\Response;
 
 // Prendiamo il path dalla configurazione, con un default
 $path = config('mcp.transports.http.path', '/mcp-rpc');
@@ -14,40 +14,65 @@ if (!empty($path)) {
         ->name('mcp.rpc.http.post');
 
     // Add a GET route for SSE Transport / compatibility with MCP clients
-    Route::get($path, function () {
-        // Impostiamo immediatamente gli header per SSE
-        $response = new Response();
-        $response->header('Content-Type', 'text/event-stream');
-        $response->header('Cache-Control', 'no-cache');
-        $response->header('Connection', 'keep-alive');
-        $response->header('X-Accel-Buffering', 'no');
+    Route::get($path, function (Request $request) {
+        // Impostiamo gli header per SSE
+        $response = response()->stream(
+            function () {
+                // Send connection initialization message according to MCP protocol
+                echo "data: " . json_encode([
+                    "jsonrpc" => "2.0",
+                    "method" => "initialize",
+                    "params" => [
+                        "protocolVersion" => "2.0",
+                        "serverInfo" => [
+                            "name" => "Laravel MCP Server",
+                            "version" => "1.0.0"
+                        ],
+                        "capabilities" => [
+                            "resources" => [],
+                            "tools" => []
+                        ]
+                    ]
+                ]) . "\n\n";
+                ob_flush();
+                flush();
 
-        // Forziamo l'invio degli header prima di iniziare lo streaming
-        $response->sendHeaders();
+                // After initialization, wait for client requests
+                $lastPingTime = time();
 
-        // Inviamo il messaggio iniziale
-        echo "data: " . json_encode([
-            'type' => 'connection',
-            'status' => 'ok',
-            'message' => 'Laravel MCP Server HTTP SSE Transport active.'
-        ]) . "\n\n";
+                while (true) {
+                    // Check connection status
+                    if (connection_aborted()) {
+                        break;
+                    }
 
-        ob_flush();
-        flush();
+                    // Send heartbeat notification every 30 seconds
+                    if (time() - $lastPingTime >= 30) {
+                        echo "data: " . json_encode([
+                            "jsonrpc" => "2.0",
+                            "method" => "ping",
+                            "params" => [
+                                "timestamp" => time()
+                            ]
+                        ]) . "\n\n";
 
-        // Keep the connection open
-        while (true) {
-            // Check connection status
-            if (connection_aborted()) {
-                break;
-            }
+                        $lastPingTime = time();
+                        ob_flush();
+                        flush();
+                    }
 
-            // Send heartbeat every 30 seconds
-            sleep(30);
-            echo "data: " . json_encode(['type' => 'heartbeat']) . "\n\n";
-            ob_flush();
-            flush();
-        }
+                    // Small sleep to prevent CPU usage
+                    usleep(100000); // 100ms
+                }
+            },
+            200,
+            [
+                'Content-Type' => 'text/event-stream',
+                'Cache-Control' => 'no-cache',
+                'Connection' => 'keep-alive',
+                'X-Accel-Buffering' => 'no'
+            ]
+        );
 
         return $response;
     })->name('mcp.rpc.http.get');
