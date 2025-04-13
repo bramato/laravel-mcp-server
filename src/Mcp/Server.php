@@ -31,6 +31,17 @@ class Server implements ServerInterface
         // Registration happens via registerResource/registerTool
     }
 
+
+    /**
+     * List all tools available in the server.
+     *
+     * @return array
+     */
+    public function listTools(): array
+    {
+        return $this->initialize();
+    }
+
     /**
      * Implementation of the MCP 'initialize' method.
      *
@@ -238,16 +249,13 @@ class Server implements ServerInterface
 
         try {
             // 1. Handle 'initialize'
-            if ($method === 'initialize') {
+            if ($method === 'initialize' || $method === 'list_tools') {
                 // DEBUG: Log type and value of params
                 Log::debug('MCP Initialize: Checking params', [
                     'type' => gettype($params),
                     'value' => print_r($params, true)
                 ]);
                 // Use empty() after casting to array to handle both [] and {}
-                if (!empty((array)$params)) {
-                    throw new InvalidParams("The 'initialize' method does not accept parameters.");
-                }
                 $result = $this->initialize();
                 return $this->createJsonRpcResultResponse($id, $result);
             }

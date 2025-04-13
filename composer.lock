@@ -7563,16 +7563,16 @@
         },
         {
             "name": "orchestra/testbench",
-            "version": "v10.2.0",
+            "version": "v10.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench.git",
-                "reference": "1d2f49a06c17c91c6936511c83758ea4322c62cd"
+                "reference": "971f85b7c023dce1db1d61b7e8fa4883fa2db262"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench/zipball/1d2f49a06c17c91c6936511c83758ea4322c62cd",
-                "reference": "1d2f49a06c17c91c6936511c83758ea4322c62cd",
+                "url": "https://api.github.com/repos/orchestral/testbench/zipball/971f85b7c023dce1db1d61b7e8fa4883fa2db262",
+                "reference": "971f85b7c023dce1db1d61b7e8fa4883fa2db262",
                 "shasum": ""
             },
             "require": {
@@ -7580,8 +7580,8 @@
                 "fakerphp/faker": "^1.23",
                 "laravel/framework": "^12.3.0",
                 "mockery/mockery": "^1.6.10",
-                "orchestra/testbench-core": "^10.2.0",
-                "orchestra/workbench": "^10.0.4",
+                "orchestra/testbench-core": "^10.2.1",
+                "orchestra/workbench": "^10.0.6",
                 "php": "^8.2",
                 "phpunit/phpunit": "^11.5.3|^12.0.1",
                 "symfony/process": "^7.2",
@@ -7612,9 +7612,9 @@
             ],
             "support": {
                 "issues": "https://github.com/orchestral/testbench/issues",
-                "source": "https://github.com/orchestral/testbench/tree/v10.2.0"
+                "source": "https://github.com/orchestral/testbench/tree/v10.2.1"
             },
-            "time": "2025-04-06T11:42:16+00:00"
+            "time": "2025-04-13T01:19:04+00:00"
         },
         {
             "name": "orchestra/testbench-core",
