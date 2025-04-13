@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Bramato\LaravelMcpServer\Http\Controllers\RpcController;
-use Symfony\Component\HttpFoundation\StreamedResponse; // Needed for SSE
 
 // Prendiamo il path dalla configurazione, con un default
 $path = config('mcp.transports.http.path', '/mcp-rpc');
@@ -13,22 +12,11 @@ if (!empty($path)) {
     Route::post($path, [RpcController::class, 'handle'])
         ->name('mcp.rpc.http.post');
 
-    // Add a GET route for health check / compatibility with clients expecting SSE
+    // Add a GET route for health check / compatibility with clients like Cursor
     Route::get($path, function () {
-        // Return a minimal valid SSE response
-        $response = new StreamedResponse(function () {
-            // Send a comment to keep the connection open or signal readiness
-            echo ": MCP Server Ready\n\n";
-            flush();
-            // Normally, you might loop here sending events, but for just satisfying
-            // the content type check, a single comment might suffice.
-            // If Cursor *needs* continuous events, this would need expansion.
-        });
-        $response->headers->set('Content-Type', 'text/event-stream');
-        $response->headers->set('Cache-Control', 'no-cache');
-        $response->headers->set('X-Accel-Buffering', 'no'); // Useful for Nginx proxying
-        $response->headers->set('Connection', 'keep-alive');
-
-        return $response;
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Laravel MCP Server HTTP endpoint is active. Use POST for JSON-RPC requests.'
+        ]);
     })->name('mcp.rpc.http.get');
 }
