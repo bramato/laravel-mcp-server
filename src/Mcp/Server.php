@@ -44,19 +44,26 @@ class Server implements ServerInterface
 
     /**
      * Implementation of the MCP 'initialize' method.
+     * Returns server capabilities including resources and tools.
      *
-     * @return array
+     * @return array The capabilities structure.
      */
     public function initialize(): array
     {
         $resourceUris = [];
-        foreach ($this->resources as $resource) {
+        /** @var ResourceInterface $resource */
+        foreach ($this->resources as $uri => $resource) {
+            // MCP typically expects just the URI string in the list
+            // If more details are needed, the spec might differ or require a separate method.
             $resourceUris[] = $resource->getUri();
         }
 
         $toolDetails = [];
+        /** @var ToolInterface $tool */
         foreach ($this->tools as $name => $tool) {
-            $toolDetails[$name] = [
+            // Create an object for each tool and add it to a numeric array
+            $toolDetails[] = [
+                'name' => $tool->getName(), // Include the name inside the object
                 'description' => $tool->getDescription(),
                 'inputSchema' => $tool->getInputSchema(),
             ];
@@ -64,8 +71,11 @@ class Server implements ServerInterface
 
         return [
             'capabilities' => [
+                // 'resources' field might need adjustment based on exact spec interpretation
+                // Some specs might expect objects with uri, name, mimeType here.
+                // For now, assuming a list of URIs is sufficient for discovery.
                 'resources' => $resourceUris,
-                'tools' => $toolDetails,
+                'tools' => $toolDetails, // Now this is an array of tool objects
             ]
         ];
     }
